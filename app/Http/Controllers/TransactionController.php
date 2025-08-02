@@ -139,27 +139,59 @@ class TransactionController extends Controller
         return response()->json($transactions, 200);
     }
 
-    public function monthly()
+    public function getCurrentMonth()
     {
-        $expenses = Transaction::whereMonth('created_at', '=', Carbon::now()->month)
-            ->whereYear('created_at', '=', Carbon::now()->year)
-            ->whereHas('category', function ($query) {
-                $query->where('is_income', false);
-            })
-            ->sum('sum');
+        $endDate = Carbon::now()->endOfMonth();
+        $startDate = $endDate->copy()->startOfMonth();
 
-        $incomes = Transaction::whereMonth('created_at', '=', Carbon::now()->month)
-            ->whereYear('created_at', '=', Carbon::now()->year)
-            ->whereHas('category', function ($query) {
-                $query->where('is_income', true);
-            })
-            ->sum('sum');
+        $transactions = $this->getSubtotalsByMonth($startDate, $endDate);
 
-        $monthly = [
-            'expenses' => $expenses,
-            'incomes' => $incomes
-        ];
+        return response()->json($transactions, 200);
+    }
 
-        return response()->json($monthly, 200);
+    public function getMonthly(Request $request)
+    {
+        $endDate = Carbon::now()->endOfMonth();
+        if (isset($request->to)) {
+            $endDate = Carbon::parse($request->to);
+        }
+
+        $startDate = $endDate->copy()->startOfMonth()->subMonths(11);
+        if (isset($request->from)) {
+            $startDate = Carbon::parse($request->from);
+        }
+
+        $transactions = $this->getSubtotalsByMonth($startDate, $endDate);
+
+        return response()->json($transactions, 200);
+    }
+
+    private function getSubtotalsByMonth(Carbon $startDate, Carbon $endDate)
+    {
+        $transactions = Transaction::with('category')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->select('*', \DB::raw("to_char(created_at, 'YYYY-MM') period"))
+            ->orderBy('period', 'DESC')
+            ->get();
+
+        $transactions = $transactions->groupBy('period')->map(function ($group) {
+            $expenses = 0;
+            $incomes = 0;
+
+            $group->each(function ($item) use (&$expenses, &$incomes) {
+                if ($item->category->is_income) {
+                    $incomes = $incomes + $item->sum;
+                } else {
+                    $expenses = $expenses + $item->sum;
+                }
+            });
+
+            return [
+                'expenses' => $expenses,
+                'incomes' => $incomes
+            ];
+        });
+
+        return $transactions;
     }
 }

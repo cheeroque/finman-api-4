@@ -29,7 +29,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/first', [TransactionController::class, 'first']);
         Route::get('/search', [TransactionController::class, 'search']);
         Route::get('/total', [TransactionController::class, 'total']);
-        Route::get('/monthly', [TransactionController::class, 'monthly']);
+        Route::get('/current-month', [TransactionController::class, 'getCurrentMonth']);
+        Route::get('/monthly', [TransactionController::class, 'getMonthly']);
         Route::get('/month/{year}-{month}', [TransactionController::class, 'getByMonth']);
         Route::get('/category/{categoryId}', [TransactionController::class, 'getByCategory']);
 
