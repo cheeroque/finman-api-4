@@ -6,16 +6,25 @@ use App\Models\Category;
 use App\Models\Transaction;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class TransactionController extends Controller
 {
     public function index(Request $request)
     {
-        $perPage = $request->perPage ?? 10;
+        $perPage = $request->perPage ?? 50;
         $orderBy = $request->orderBy ?? 'created_at';
         $order = $request->order ?? 'DESC';
 
         $transactions = Transaction::with('category')->orderBy($orderBy, $order);
+
+        if (isset($request->filter)) {
+            $searchQuery = "%{$request->filter}%";
+
+            $transactions = $transactions->whereHas('category', function ($query) use ($searchQuery) {
+                $query->whereLike('name', $searchQuery);
+            })->orWhereLike('note', $searchQuery);
+        }
 
         if (isset($request->show)) {
             $showIncome = $request->show === 'income' ? true : false;
@@ -24,6 +33,11 @@ class TransactionController extends Controller
                 $query->where('is_income', $showIncome);
             });
         }
+
+        if (isset($request->marked)) {
+            $transactions = $transactions->where('is_marked', $request->marked === 'true');
+        }
+
         $transactions = $transactions->paginate($perPage);
 
         return response()->json($transactions, 200);
@@ -121,22 +135,6 @@ class TransactionController extends Controller
         $transaction = Transaction::orderBy('created_at', 'ASC')->first();
 
         return response()->json($transaction, 200);
-    }
-
-    public function search(Request $request)
-    {
-        $searchQuery = "%{$request->q}%";
-        $perPage = $request->perPage ?? 50;
-
-        $transactions = Transaction::with('category')
-            ->whereHas('category', function ($query) use ($searchQuery) {
-                $query->whereLike('name', $searchQuery);
-            })
-            ->orWhereLike('note', $searchQuery)
-            ->orderBy('created_at', 'DESC');
-        $transactions = $transactions->paginate($perPage);
-
-        return response()->json($transactions, 200);
     }
 
     public function getCurrentMonth()
