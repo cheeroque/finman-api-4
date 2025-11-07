@@ -92,14 +92,14 @@ class TransactionController extends Controller
         return response()->json($transactions, 200);
     }
 
-    public function getByCategory(Request $request, $categoryId)
+    public function getByCategory(Request $request, string $slug)
     {
         $page = $request->page ?? 1;
         $perPage = $request->perPage ?? 12;
 
-        $category = Category::find($categoryId)->first();
+        $category = Category::where('slug', $slug)->firstOrFail();
 
-        $transactions = Transaction::where('category_id', $categoryId)
+        $transactions = Transaction::where('category_id', $category->id)
             ->select('*', \DB::raw("to_char(created_at, 'YYYY-MM') period"))
             ->orderBy('period', 'DESC')
             ->get();

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class CategoryController extends Controller
 {
@@ -12,9 +13,11 @@ class CategoryController extends Controller
         return Category::all();
     }
 
-    public function get(Category $category)
+    public function get(string $slug)
     {
-        return $category;
+        $category = Category::where('slug', $slug)->firstOrFail();
+
+        return response()->json($category, 200);
     }
 
     public function store(Request $request)

@@ -17,7 +17,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::group(['prefix' => 'categories'], function () {
         Route::get('/', [CategoryController::class, 'index']);
         Route::post('/', [CategoryController::class, 'store']);
-        Route::get('/{category}', [CategoryController::class, 'get']);
+        Route::get('/{slug}', [CategoryController::class, 'get']);
         Route::put('/{category}', [CategoryController::class, 'update']);
         Route::delete('/{category}', [CategoryController::class, 'delete']);
     });
@@ -31,7 +31,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/current-month', [TransactionController::class, 'getCurrentMonth']);
         Route::get('/monthly', [TransactionController::class, 'getMonthly']);
         Route::get('/month/{year}-{month}', [TransactionController::class, 'getByMonth']);
-        Route::get('/category/{categoryId}', [TransactionController::class, 'getByCategory']);
+        Route::get('/category/{slug}', [TransactionController::class, 'getByCategory']);
 
         Route::get('/{transaction}', [TransactionController::class, 'get']);
         Route::put('/{transaction}', [TransactionController::class, 'update']);
