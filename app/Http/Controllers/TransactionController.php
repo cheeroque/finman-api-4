@@ -85,7 +85,7 @@ class TransactionController extends Controller
         $transactions = Transaction::with('category')
             ->whereYear('created_at', $year)
             ->whereMonth('created_at', $month)
-            ->orderBy('created_at', 'DESC')
+            ->orderBy('sum', 'DESC')
             ->get();
         $transactions = $transactions->groupBy('category_id');
 
