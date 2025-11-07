@@ -12,6 +12,7 @@ class Transaction extends Model
         'note',
         'category_id',
         'user_id',
+        'is_marked',
         'created_at',
         'updated_at'
     ];
