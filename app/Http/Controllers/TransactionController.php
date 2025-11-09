@@ -6,7 +6,6 @@ use App\Models\Category;
 use App\Models\Transaction;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class TransactionController extends Controller
 {
@@ -68,7 +67,7 @@ class TransactionController extends Controller
 
     public function update(Request $request, Transaction $transaction)
     {
-        $transaction->update($request->only('note', 'sum', 'category_id', 'created_at'));
+        $transaction->update($request->only('note', 'sum', 'is_marked', 'category_id', 'created_at'));
 
         return response()->json($transaction, 200);
     }
