@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Transaction;
+use App\Exports\TransactionsExport;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 
 class TransactionController extends Controller
 {
@@ -161,6 +164,18 @@ class TransactionController extends Controller
         $transactions = $this->getSubtotalsByMonth($startDate, $endDate);
 
         return response()->json($transactions, 200);
+    }
+
+    public function export()
+    {
+        $datetime = Carbon::now()->format('d-m-Y_H-i-s');
+        $filepath = "export/transactions-{$datetime}.xlsx";
+
+        Excel::store(new TransactionsExport(), $filepath, 'public');
+
+        $response = Storage::url($filepath);
+
+        return $response;
     }
 
     private function getSubtotalsByMonth(Carbon $startDate, Carbon $endDate)

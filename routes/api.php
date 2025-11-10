@@ -32,6 +32,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/monthly', [TransactionController::class, 'getMonthly']);
         Route::get('/month/{year}-{month}', [TransactionController::class, 'getByMonth']);
         Route::get('/category/{slug}', [TransactionController::class, 'getByCategory']);
+        Route::get('/export', [TransactionController::class, 'export']);
 
         Route::get('/{transaction}', [TransactionController::class, 'get']);
         Route::put('/{transaction}', [TransactionController::class, 'update']);
