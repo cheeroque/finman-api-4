@@ -104,6 +104,7 @@ class TransactionController extends Controller
         $transactions = Transaction::where('category_id', $category->id)
             ->select('*', \DB::raw("to_char(created_at, 'YYYY-MM') period"))
             ->orderBy('period', 'DESC')
+            ->orderBy('created_at', 'DESC')
             ->get();
         $transactions = $transactions->groupBy('period');
         $total = $transactions->count();
