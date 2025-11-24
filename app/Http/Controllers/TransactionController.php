@@ -28,8 +28,8 @@ class TransactionController extends Controller
             })->orWhereLike('note', $searchQuery);
         }
 
-        if (isset($request->show)) {
-            $showIncome = $request->show === 'income' ? true : false;
+        if (isset($request->view)) {
+            $showIncome = $request->view === 'income' ? true : false;
 
             $transactions = $transactions->whereHas('category', function ($query) use ($showIncome) {
                 $query->where('is_income', $showIncome);
