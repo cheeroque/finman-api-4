@@ -11,7 +11,8 @@ class Category extends Model
         'name',
         'slug',
         'color',
-        'is_income'
+        'is_income',
+        'sort_order'
     ];
 
     public function transactions(): HasMany
