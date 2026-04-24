@@ -61,7 +61,7 @@ class TransactionController extends Controller
         ]);
 
         $transaction = Transaction::create(array_merge(
-            $request->only('note', 'sum', 'category_id', 'created_at'),
+            $request->only('note', 'sum', 'is_marked', 'category_id', 'created_at'),
             ['user_id' => auth('sanctum')->user()->id]
         ));
 
